@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # Serviço 1: ETL (Python)
+  # Roda uma vez, cria o banco e desliga (exit 0)
+  etl:
+    build: ./etl
+    volumes:
+      - ./data:/app/data
+      - ./backend/database:/app/schema
+    command: python scripts/import_data.py
+
+  # Serviço 2: API (Node.js)
+  # Fica rodando continuamente na porta 3000
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      etl:
+        condition: service_completed_successfully # Só inicia se o ETL rodar com sucesso
+    environment:
+      - DB_PATH=/app/data/database.sqlite
+      - PORT=3000

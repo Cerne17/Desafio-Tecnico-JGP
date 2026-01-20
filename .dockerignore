@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+Dockerfile
+.git
+.gitignore
+data/*
+!data/.gitkeep
+__pycache__
+.venv
+venv
+.DS_Store
