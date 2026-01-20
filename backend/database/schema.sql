@@ -1,0 +1,24 @@
+DROP TABLE IF EXISTS Primario;
+DROP TABLE IF EXISTS Emissor;
+DROP TABLE IF EXISTS Tipo;
+
+CREATE TABLE Emissor (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE Tipo (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    codigo TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE Primario (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_emissor INTEGER NOT NULL,
+    id_tipo INTEGER NOT NULL,
+    data TEXT NOT NULL, -- SQLite usa TEXT para datas (ISO8601 YYYY-MM-DD)
+    valor INTEGER NOT NULL, -- Valor em centavos (BigInt)
+    link TEXT,
+    FOREIGN KEY (id_emissor) REFERENCES Emissor(id),
+    FOREIGN KEY (id_tipo) REFERENCES Tipo(id)
+);
