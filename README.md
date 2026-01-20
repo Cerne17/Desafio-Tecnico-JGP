@@ -133,4 +133,4 @@ Tomei a decisão de quebrar a tabela oferecida em 3 entidades no banco para norm
 * Implementação de testes automatizados (Jest para Backend, Pytest para ETL).
 * Adição de autenticação JWT para as rotas de edição.
 * Pipeline de CI/CD via GitHub Actions.
-
+* Criação de testes unitários usando jest para o Backend
