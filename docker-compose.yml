@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Serviço 1: ETL (Python)
   # Roda uma vez, cria o banco e desliga (exit 0)
@@ -8,6 +6,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./backend/database:/app/schema
+      - ./etl/input:/app/input
     command: python scripts/import_data.py
 
   # Serviço 2: API (Node.js)
