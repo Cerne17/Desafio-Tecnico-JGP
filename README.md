@@ -36,7 +36,7 @@ O projeto foi totalmente containerizado para garantir consistência e facilidade
 
 Adotei uma arquitetura orientada a serviços utilizando **Docker Compose** para orquestrar três containers distintos, garantindo separação de responsabilidades:
 
-* **ETL (Service):** Um container Python efêmero que lê o Excel, normaliza os dados e popula o banco SQLite. Ele roda uma vez e encerra.
+* **ETL (Service):** Um container Python efêmero que executa uma pipeline completa: leitura do Excel, validação de integridade via API da CVM e aplicação de correções automáticas.
 * **Backend (API):** Um servidor Node.js/Express persistente que serve os dados via REST.
 * **Frontend (Client):** Uma aplicação React servida por Nginx (via Multi-stage build) para alta performance.
 
@@ -60,7 +60,11 @@ Adotei uma arquitetura orientada a serviços utilizando **Docker Compose** para 
 │   │   └── ...
 └── etl/                        # Script de Ingestão de Dados
     ├── scripts/
-    │   └── import_data.py      # Lógica de processamento e sanitização
+    │   ├── run_pipeline.sh     # Orquestrador da pipeline (Import -> Validate -> Fix)
+    │   ├── import_data.py      # Ingestão de dados bruta do Excel
+    │   ├── validate_data.py    # Comparação com API oficial da CVM
+    │   ├── fix_data.py         # Aplicação de correções de integridade
+    │   └── scraper.py          # Módulo de comunicação com a API CVM
     └── input/                  # Arquivos brutos (.xlsx)
 ```
 
@@ -92,6 +96,17 @@ Responsável por sanitizar e estruturar os dados brutos.
 * **Recharts:** Biblioteca de gráficos para o dashboard.
 * **Zod & React Hook Form:** Validação robusta de formulários.
 * **Docker Multi-stage:** O container final usa Nginx para servir arquivos estáticos, simulando um ambiente de produção real.
+
+## Integridade de Dados e Validação (CVM)
+
+Um dos diferenciais deste projeto é a garantia de integridade dos dados financeiros. Como a base bruta (Excel) pode conter divergências, implementei um sistema de validação automática:
+
+1. **Scraping Oficial:** O sistema consulta a API REST interna da CVM para cada oferta financeira.
+2. **Resiliência:** O scraper utiliza múltiplos endpoints (`requerimento` e `informacoesGerais`) e possui salvaguardas para ignorar valores nulos/zeros da API que poderiam corromper dados válidos.
+3. **Correção Automática:** Se o valor oficial da CVM divergir do Excel, o sistema prioriza a informação oficial e atualiza o banco de dados automaticamente durante a pipeline de subida do Docker.
+
+> [!TIP]
+> Essa etapa garante que o dashboard reflita valores 100% íntegros e auditados pelo órgão regulador.
 
 ## Modelagem do Banco de Dados
 
@@ -177,7 +192,7 @@ Os testes cobrem:
 ## Melhorias Futuras
 1. **CI/CD:** Configurar GitHub Actions para rodar linters e build automaticamente.
 2. **Hospedagem:** Deploy da imagem Docker em serviço de nuvem (AWS/Render).
-3. **Scraping de dados:** Extrair mais informações e checar a integridade da base de dados, buscando atualizações, para sempre ter as informações atualizadas para o cliente.
+3. **Enriquecimento de Dados:** Extrair campos adicionais da CVM (como setor, status e participantes) para análises mais profundas.
 
 ---
 
