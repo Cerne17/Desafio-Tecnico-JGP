@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "scripts/import_data.py"]
+CMD ["sh", "scripts/run_pipeline.sh"]

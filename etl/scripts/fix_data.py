@@ -2,26 +2,20 @@ import sqlite3
 import pandas as pd
 import os
 
-# Caminhos baseados no local do arquivo para evitar erros de CWD
+# Caminhos configuráveis via ENV ou detecção inteligente
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, '../data/database.sqlite')
-REPORT_FILE = os.path.join(BASE_DIR, 'discrepancy_report.csv')
+DB_PATH = os.getenv('DB_PATH', os.path.join(BASE_DIR, '../data/database.sqlite'))
+REPORT_FILE = os.getenv('REPORT_FILE', os.path.join(BASE_DIR, 'discrepancy_report.csv'))
 
 def fix_database():
     if not os.path.exists(REPORT_FILE):
         print(f"❌ Relatório {REPORT_FILE} não encontrado. Rode o script de validação primeiro.")
         return
 
-    if not os.path.exists(DB_PATH):
-        # Tenta caminho alternativo se rodar da raiz
-        DB_PATH_ALT = 'data/database.sqlite'
-        if os.path.exists(DB_PATH_ALT):
-            current_db = DB_PATH_ALT
-        else:
-            print(f"❌ Banco de dados não encontrado em {DB_PATH}")
-            return
-    else:
-        current_db = DB_PATH
+    current_db = DB_PATH
+    if not os.path.exists(current_db):
+        print(f"❌ Banco de dados não encontrado em {current_db}")
+        return
 
     print(f"🔌 Conectando ao banco em {current_db}...")
     conn = sqlite3.connect(current_db)

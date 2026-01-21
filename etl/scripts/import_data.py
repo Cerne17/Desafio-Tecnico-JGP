@@ -2,12 +2,10 @@ import pandas as pd
 import sqlite3
 import os
 
-# Caminhos definidos no Dockerfile/Docker-compose
-DB_PATH = '/app/data/database.sqlite'
-SCHEMA_PATH = '/app/schema/schema.sql'
-EXCEL_FILE = '/app/data/base_2025.xlsx'
-
-EXCEL_FILE_FINAL = '/app/input/base_2025.xlsx'
+# Caminhos configuráveis via ENV ou caminhos padrões
+DB_PATH = os.getenv('DB_PATH', '/app/data/database.sqlite')
+SCHEMA_PATH = os.getenv('SCHEMA_PATH', '/app/schema/schema.sql')
+EXCEL_FILE_FINAL = os.getenv('EXCEL_FILE', '/app/input/base_2025.xlsx')
 
 def clean_data(df):
     """Limpa e normaliza o DataFrame."""

@@ -7,7 +7,7 @@ services:
       - ./data:/app/data
       - ./backend/database:/app/schema
       - ./etl/input:/app/input
-    command: python scripts/import_data.py
+    command: sh scripts/run_pipeline.sh
 
   # Serviço 2: API (Node.js)
   # Fica rodando continuamente na porta 3000

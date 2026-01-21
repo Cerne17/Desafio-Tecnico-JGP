@@ -2,8 +2,9 @@ import pandas as pd
 import os
 from scraper import extract_offer_id, fetch_cvm_data, parse_valor_total
 
-# Configurações
-EXCEL_FILE = 'input/base_2025.xlsx'
+# Configurações via ENV
+EXCEL_FILE = os.getenv('EXCEL_FILE', 'input/base_2025.xlsx')
+REPORT_FILE = os.getenv('REPORT_FILE', 'discrepancy_report.csv')
 
 def validate_data():
     if not os.path.exists(EXCEL_FILE):
@@ -55,8 +56,8 @@ def validate_data():
         print(report_df.to_string(index=False))
         
         # Salva o relatório
-        report_df.to_csv('discrepancy_report.csv', index=False)
-        print(f"\n📄 Relatório salvo em 'discrepancy_report.csv'")
+        report_df.to_csv(REPORT_FILE, index=False)
+        print(f"\n📄 Relatório salvo em '{REPORT_FILE}'")
     else:
         print("✅ Nenhuma divergência encontrada nos registros validados.")
 
