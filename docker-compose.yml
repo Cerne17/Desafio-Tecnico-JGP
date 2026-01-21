@@ -23,3 +23,11 @@ services:
     environment:
       - DB_PATH=/app/data/database.sqlite
       - PORT=3000
+
+  # Serviço 3: Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80" # Acessível em localhost
+    depends_on:
+      - backend
