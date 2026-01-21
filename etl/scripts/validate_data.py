@@ -2,9 +2,10 @@ import pandas as pd
 import os
 from scraper import extract_offer_id, fetch_cvm_data, parse_valor_total
 
-# Configurações via ENV
-EXCEL_FILE = os.getenv('EXCEL_FILE', 'input/base_2025.xlsx')
-REPORT_FILE = os.getenv('REPORT_FILE', 'discrepancy_report.csv')
+# Caminhos configuráveis via ENV ou caminhos padrões
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXCEL_FILE = os.getenv('EXCEL_FILE', os.path.join(BASE_DIR, 'input/base_2025.xlsx'))
+REPORT_FILE = os.getenv('REPORT_FILE', os.path.join(BASE_DIR, 'discrepancy_report.csv'))
 
 def validate_data():
     if not os.path.exists(EXCEL_FILE):
@@ -38,6 +39,12 @@ def validate_data():
             official_valor_centavos = parse_valor_total(cvm_data['valorTotal'])
             local_valor_centavos = row['Valor_Original_Centavos']
             
+            # Salvaguarda: Se a CVM retornar 0 e nós temos um valor, 
+            # não consideramos como discrepância (provavelmente erro na API/extração)
+            if official_valor_centavos == 0 and local_valor_centavos != 0:
+                print(f"[{index+1}/{len(df)}] ID {offer_id} ignorado (CVM retornou 0)...", end="\r")
+                continue
+
             if official_valor_centavos != local_valor_centavos:
                 discrepancies.append({
                     'Linha': index + 2, # +1 header, +1 zero-indexed

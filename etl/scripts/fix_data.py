@@ -2,10 +2,16 @@ import sqlite3
 import pandas as pd
 import os
 
-# Caminhos configuráveis via ENV ou detecção inteligente
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.getenv('DB_PATH', os.path.join(BASE_DIR, '../data/database.sqlite'))
-REPORT_FILE = os.getenv('REPORT_FILE', os.path.join(BASE_DIR, 'discrepancy_report.csv'))
+# Caminhos configuráveis via ENV ou caminhos padrões
+# Priorizamos variáveis de ambiente para o Docker
+DB_PATH = os.getenv('DB_PATH', '/app/data/database.sqlite')
+REPORT_FILE = os.getenv('REPORT_FILE', '/app/discrepancy_report.csv')
+
+# Se não estiver no Docker, tenta caminhos relativos para desenvolvimento local
+if not os.path.exists(DB_PATH) and not os.getenv('DB_PATH'):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DB_PATH = os.path.join(BASE_DIR, '../data/database.sqlite')
+    REPORT_FILE = os.path.join(BASE_DIR, 'discrepancy_report.csv')
 
 def fix_database():
     if not os.path.exists(REPORT_FILE):
