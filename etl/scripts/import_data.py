@@ -7,12 +7,19 @@ DB_PATH = os.getenv('DB_PATH', '/app/data/database.sqlite')
 SCHEMA_PATH = os.getenv('SCHEMA_PATH', '/app/schema/schema.sql')
 EXCEL_FILE_FINAL = os.getenv('EXCEL_FILE', '/app/input/base_2025.xlsx')
 
+# Se não estiver no Docker, tenta caminhos relativos
+if not os.path.exists(DB_PATH) and not os.getenv('DB_PATH'):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DB_PATH = os.path.join(BASE_DIR, '../data/database.sqlite')
+    SCHEMA_PATH = os.path.join(BASE_DIR, '../backend/database/schema.sql')
+    EXCEL_FILE_FINAL = os.path.join(BASE_DIR, 'input/base_2025.xlsx')
+
 def clean_data(df):
     """Limpa e normaliza o DataFrame."""
     df = df.copy()
     df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce').fillna(0)
     df['Valor_Centavos'] = (df['Valor'] * 100).round().astype(int)
-    df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d')
+    df['Data'] = pd.to_datetime(df['Data'], dayfirst=True).dt.strftime('%Y-%m-%d')
     return df
 
 def run_etl():
