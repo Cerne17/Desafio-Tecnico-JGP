@@ -75,9 +75,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
@@ -120,6 +120,10 @@ export function DataTable<TData, TValue>({
           <ArrowLeft className="mr-2 h-4 w-4" />
           Anterior
         </Button>
+        <div className="flex items-center justify-center text-sm font-medium text-muted-foreground px-2">
+          Página {table.getState().pagination.pageIndex + 1} de{" "}
+          {table.getPageCount()}
+        </div>
         <Button
           variant="outline"
           size="sm"

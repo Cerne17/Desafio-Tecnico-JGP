@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, Pencil } from "lucide-react"
+import { ArrowUpDown, ExternalLink, MoreHorizontal, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -52,31 +52,51 @@ export const columns: ColumnDef<Emissao>[] = [
   {
     accessorKey: "valor",
     header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Valor
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Valor
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       const valorCentavos = parseFloat(row.getValue("valor"))
       const formatted = new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
       }).format(valorCentavos / 100)
- 
+
       return <div className="font-medium">{formatted}</div>
+    },
+  },
+  {
+    accessorKey: "link",
+    header: "CVM",
+    cell: ({ row }) => {
+      const link = row.getValue("link") as string
+      if (!link) return null
+
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+          onClick={() => window.open(link, "_blank")}
+          title="Ver na CVM"
+        >
+          <ExternalLink className="h-4 w-4" />
+        </Button>
+      )
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
       const emissao = row.original
- 
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -93,14 +113,14 @@ export const columns: ColumnDef<Emissao>[] = [
               Copiar ID
             </DropdownMenuItem>
             {emissao.link && (
-                <DropdownMenuItem onClick={() => window.open(emissao.link!, "_blank")}>
-                    Ver Documento Original
-                </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.open(emissao.link!, "_blank")}>
+                Ver Documento Original
+              </DropdownMenuItem>
             )}
-            <DropdownMenuItem 
-                className="text-blue-600 focus:text-blue-700 font-medium"
-                // Aqui vamos conectar com o Modal de Edição depois
-                onClick={() => console.log("Editar", emissao)} 
+            <DropdownMenuItem
+              className="text-blue-600 focus:text-blue-700 font-medium"
+              // Aqui vamos conectar com o Modal de Edição depois
+              onClick={() => console.log("Editar", emissao)}
             >
               <Pencil className="mr-2 h-4 w-4" />
               Editar Oferta
