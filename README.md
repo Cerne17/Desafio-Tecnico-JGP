@@ -1,136 +1,154 @@
 # Desafio Técnico - JGP Crédito
 
-Este projeto é minha resolução para o desafio técnico para a vaga de estagiário em desenvolvimento para a JGP Créditos. Abaixo explico a organização das pastas, como fazer a instalação e utilizar cada componente do sistema e, posteriormente, exponho uma breve explicação teórica por trás das decisões que tomei.
+Este repositório contém a minha solução para o desafio técnico de estágio em desenvolvimento Fullstack na JGP Crédito.
 
-O objetivo foi desenvolver uma aplicação robusta que processa dados do mercado financeiro (ETL), expõe uma API REST para consulta/edição e apresenta um Dashboard interativo.
+O projeto consiste em uma aplicação completa para gestão de ofertas do mercado primário, abrangendo desde a ingestão de dados (ETL) até a visualização em um dashboard interativo.
 
-## Organização do Projeto
+## Como Executar
 
-Adotei uma arquitetura orientada a serviços utilizando **Docker**, garantindo isolamento de responsabilidades e facilidade de execução.
+O projeto foi totalmente containerizado para garantir consistência e facilidade de execução. Você não precisa instalar Python, Node ou bibliotecas locais.
 
-**Estrutura de Diretórios**:
+### Pré-requisitos
 
-Dividi o projeto em 3 partes: 
+- **Docker** e **Docker Compose** instalados.
 
-* **etl (extract, transform & load)**: responsável por estudar a estrutura dos dados fornecidos e fazer a sanitização — caso necessário — dos dados;
-* **frontend**: responsável por expor, de forma intuitiva e interativa os dados para o usuário final;
-* **backend**: responsável pela lógica do servidor, banco de dados e autenticação (extra).
+### Passo a Passo
+
+1. Clone o repositório:
+   ```bash
+   # Com HTTPS
+   git clone https://github.com/Cerne17/Desafio-Tecnico-JGP.git
+
+   # Ou com SSH
+   git clone git@github.com:Cerne17/Desafio-Tecnico-JGP.git
+
+   cd Desafio-Tecnico-JGP
+   ```
+2. Suba o ambiente com um único comando:
+    ```bash
+    docker-compose up --build
+    ```
+3. Acesse a aplicação:
+    * **Frontend (Interface):** http://localhost:80
+    * **Backend (API):** http://localhost:3000
+
+## Arquitetura do Projeto
+
+Adotei uma arquitetura orientada a serviços utilizando **Docker Compose** para orquestrar três containers distintos, garantindo separação de responsabilidades:
+
+* **ETL (Service):** Um container Python efêmero que lê o Excel, normaliza os dados e popula o banco SQLite. Ele roda uma vez e encerra.
+* **Backend (API):** Um servidor Node.js/Express persistente que serve os dados via REST.
+* **Frontend (Client):** Uma aplicação React servida por Nginx (via Multi-stage build) para alta performance.
+
+**Estrutura de Diretórios**
 
 ```text
 .
-├── docker-compose.yml          # Orquestrador dos containers
-├── README.md
+├── docker-compose.yml          # Orquestrador dos serviços
 ├── data/                       # Volume compartilhado (Persistência do SQLite)
-├── backend/                    # API Node.js + Express
-│   ├── Dockerfile
+├── backend/                    # API Node.js + Express (MVC)
 │   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   └── models/
-│   └── database/               # (Mapeado para o volume data/)
-├── frontend/                   # Interface Web (React/Vite)
-└── etl/                        # Serviço de Ingestão de Dados
-    ├── Dockerfile
+│   │   ├── controllers/        # Regras de entrada/saída
+│   │   ├── models/             # Queries SQL e lógica de dados
+│   │   ├── routes/             # Definição de endpoints
+│   │   └── lib/                # Configuração do banco
+│   └── database/               # Schema SQL
+├── frontend/                   # Interface Web (Vite + React + TS)
+│   ├── src/
+│   │   ├── components/         # UI (shadcn) e Widgets
+│   │   ├── services/           # Integração com API
+│   │   └── ...
+└── etl/                        # Script de Ingestão de Dados
     ├── scripts/
-    │   └── import_data.py      # Script de processamento
-    └── input/
-        └── base_2025.xlsx      # Fonte de dados original
+    │   └── import_data.py      # Lógica de processamento e sanitização
+    └── input/                  # Arquivos brutos (.xlsx)
 ```
 
-## Como executar
-
-Todo o ambiente (banco de dados, script de importação e API) foi containerizado.
-
-**Pré-requisitos:**
-
-* Docker e Docker Compose instalados.
-
-**Passo a Passo:**
-
-1. Na raiz do projeto, execute:
-    ```bash
-        docker-compose up --build
-    ```
-2. O Docker irá automaticamente:
-    * Subir o container **etl**, processar a planilha Excel e criar o banco SQLite no volume compartilhado.
-    * Subir o container **backend** assim que o banco estiver pronto.
-3. A API estará disponível em: `http://localhost:3000`
-
-## Tecnologias e Decisões Arquiteturais
+## Stack Tecnológica
 
 ### 1. ETL (Extract, Transform, Load)
 
-Responsável por sanitizar e normalizar os dados brutos.
+Responsável por sanitizar e estruturar os dados brutos.
 
-* **Python & Pandas:** Escolhidos pela robustez na manipulação de dados financeiros.
-* **Openpyxl:** Para leitura do formato `.xlsx`.
+* **Python 3.12:** Linguagem base.
+* **Pandas:** Manipulação e limpeza de dados.
+* **Openpyxl:** Leitura de arquivos .xlsx.
+* **Lógica:** Normalização de emissores e tipos para garantir integridade referencial.
 
 ### 2. Backend (API)
 
-* **Node.js & Express:** Para construção de uma API REST leve e escalável.
-* **SQLite:** Banco de dados relacional (requisito do desafio).
-* **Docker:** Utilizado para orquestrar a dependência entre a criação do banco (Python) e o consumo dele (Node.js).
+* **Node.js & Express:** API REST performática.
+* **SQLite:** Banco de dados relacional leve (requisito do desafio).
+* **Arquitetura MVC:** Separação clara entre Rotas, Controllers e Models.
+* **SQLite3 Driver:** Interação direta com o banco para performance.
 
-### 3. Frontend
+### 3. Frontend (UI/UX)
 
-* **React:** Para criar uma interface reativa e organizada em componentes.
+* **React & Vite:** SPA rápida e moderna.
+* **TypeScript:** Tipagem estática para maior segurança e manutenibilidade.
+* **Tailwind CSS:** Estilização utilitária.
+* **shadcn/ui:** Componentes acessíveis e robustos (baseados em Radix UI).
+* **TanStack Table:** Gerenciamento avançado de tabelas (ordenação, filtros, paginação).
+* **Recharts:** Biblioteca de gráficos para o dashboard.
+* **Zod & React Hook Form:** Validação robusta de formulários.
+* **Docker Multi-stage:** O container final usa Nginx para servir arquivos estáticos, simulando um ambiente de produção real.
 
 ## Modelagem do Banco de Dados
 
-A partir da análise dos dados, normalizei a tabela única original em três entidades para garantir integridade e evitar redundâncias.
+Para garantir a integridade dos dados e evitar redundâncias, normalizei a tabela original do Excel em três entidades relacionais.
 
 ```mermaid
 erDiagram
     Emissor ||--|{ Primario : gera
     Tipo ||--o{ Primario : inclui
     Emissor {
-        string id PK
-        string nome
+        int id PK
+        string nome "Unique"
     }
     Tipo {
-        string id PK
-        string codigo
+        int id PK
+        string codigo "Unique"
     }
     Primario {
-        string id PK
-        string id_tipo FK
-        string id_emissor FK
-        date data
-        bigint valor
+        int id PK
+        int id_tipo FK
+        int id_emissor FK
+        date data "ISO8601"
+        bigint valor "Centavos"
         string link 
     }
 ```
 
-### Decisões de Modelagem:
+**Decisões Técnicas Importantes**
 
-**Emissor:**
+1. **Valores Monetários (`bigint`):** Optei por armazenar os valores como inteiros (**centavos**) em vez de `float` ou `decimal`. Isso evita problemas clássicos de arredondamento de ponto flutuante em sistemas financeiros. O Frontend converte para visualização (`Intl.NumberFormat`), mas o banco mantém a precisão matemática.
+2. **Normalização (Emissor/Tipo):** Ao separar `Emissor` e `Tipo` em tabelas próprias, evitamos redundância de texto e facilitamos estatísticas agrupadas. Se o nome de um emissor mudar, atualizamos apenas um registro.
+3. **Dockerização do ETL:** O script de importação não é rodado manualmente. O Docker garante que o banco seja criado e populado automaticamente antes mesmo da API iniciar, garantindo um ambiente de teste sempre "pronto para uso".
 
-* **id**: Autoincrement. Para nosso projeto, utilizaremos o autoincrement, pois não temos intensidade de inserções e, portanto, não temos que nos preocupar com problemas de colisão de chaves. Assim, soluções mais robustas como *cuid*, *uuid* ou até mesmo *snowflake* não são necessárias;
-* **nome:** Nome único do emissor.
+## Funcionalidades do Frontend
 
-**Tipo:**
+A interface foi projetada para ser intuitiva e simular uma ferramenta real de gestão:
 
-* **id:** Autoincrement;
-* **codigo:** O código do ativo (ex: CRA, CRI).
+* **Dashboard Executivo:** Cards com KPIs (Total, Volume, Ticket Médio) e gráfico de barras dos maiores emissores.
+* **Tabela Interativa:**
+    * **Ordenação:** Clique nos cabeçalhos (Data, Valor) para ordenar.
+    * **Busca Global:** Filtre por Nome do Emissor, Tipo ou ID em tempo real.
+    * **Paginação:** Navegação fluida entre registros.
+* **Edição Controlada:**
+    * Modal para edição de ofertas.
+    * Validação de dados (ex: impede valores negativos ou datas inválidas) usando **Zod**.
+    * Atualização em tempo real do dashboard após edição.
 
-**Primario:**
+## Próximos Passos e Melhorias
 
-* **id**: Autoincrement;
-* **id_tipo**: identificador do tipo (FK);
-* **id_emissor**: identificador do emissor (FK);
-* **data**: data do valor;
-* **valor:** Armazenado como bigint (centavos).
-* **link**: link do primario;
+Dado mais tempo, estas seriam as próximas implementações:
 
-> Note: não utilizamos o nome do emissor ou o código do tipo como chaves primárias, pois eles fazem parte da regra de negócios de nossa aplicação. Isto é, podem mudar com o tempo e, portanto, não devem ser usados como chaves primárias.
+1. **Testes Automatizados:** Implementar Jest para o Backend e React Testing Library para o Frontend.
+2. **Autenticação:** Adicionar login (JWT) para proteger as rotas de edição (PUT).
+3. **CI/CD:** Configurar GitHub Actions para rodar linters e build automaticamente.
+4. **Hospedagem:** Deploy da imagem Docker em serviço de nuvem (AWS/Render).
+5. **Scraping de dados:** Extrair mais informações e checar a integridade da base de dados, buscando atualizações, para sempre ter as informações atualizadas para o cliente.
 
-> Para o valor do primário, não utilizamos o tipo *decimal* ou *float*, pois isso pode levar a problemas de arredondamento.
+---
 
-Tomei a decisão de quebrar a tabela oferecida em 3 entidades no banco para normalizar os dados e, portanto, evitar redundâncias, além de garantir mais robustez para a aplicação. O maior trade-off é a complexidade de escrita e leitura de dados, mas, como não temos intensidade de escrita e, portanto, não temos que nos preocupar com problemas de colisão de chaves, a complexidade de leitura de dados é aceitável.
-
-## Melhorias Futuras
-
-* Implementação de testes automatizados (Jest para Backend, Pytest para ETL).
-* Adição de autenticação JWT para as rotas de edição.
-* Pipeline de CI/CD via GitHub Actions.
-* Criação de testes unitários usando jest para o Backend
+*Desenvolvido por Miguel Cerne*
