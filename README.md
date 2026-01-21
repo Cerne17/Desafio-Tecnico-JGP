@@ -139,15 +139,45 @@ A interface foi projetada para ser intuitiva e simular uma ferramenta real de ge
     * Validação de dados (ex: impede valores negativos ou datas inválidas) usando **Zod**.
     * Atualização em tempo real do dashboard após edição.
 
-## Próximos Passos e Melhorias
+## Testes Automatizados
 
-Dado mais tempo, estas seriam as próximas implementações:
+Implementei uma suite de testes unitários para garantir a confiabilidade das regras de negócio.
 
-1. **Testes Automatizados:** Implementar Jest para o Backend e React Testing Library para o Frontend.
-2. **Autenticação:** Adicionar login (JWT) para proteger as rotas de edição (PUT).
-3. **CI/CD:** Configurar GitHub Actions para rodar linters e build automaticamente.
-4. **Hospedagem:** Deploy da imagem Docker em serviço de nuvem (AWS/Render).
-5. **Scraping de dados:** Extrair mais informações e checar a integridade da base de dados, buscando atualizações, para sempre ter as informações atualizadas para o cliente.
+### Backend (Jest)
+Para rodar os testes do backend:
+```bash
+cd backend
+npm test
+```
+Os testes cobrem:
+* **Models:** Queries SQL, promessas e tratamento de dados.
+* **Controllers:** Endpoints da API, status codes (200, 404, 500) e integração com mocks de banco.
+
+### ETL (Pytest)
+Para rodar os testes do ETL, é necessário garantir que as dependências estejam instaladas localmente:
+
+1. Navegue até a pasta: `cd etl`
+2. (Opcional) Crie e ative um ambiente virtual:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate # Linux/Mac
+   .venv\Scripts\activate # Windows
+   ```
+3. Instale as dependências necessárias (incluindo o pytest):
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Execute os testes:
+   ```bash
+   pytest scripts/test_import_data.py
+   ```
+Os testes cobrem:
+* **Limpeza de dados:** Conversão de valores monetários para centavos e formatação de datas.
+
+## Melhorias Futuras
+1. **CI/CD:** Configurar GitHub Actions para rodar linters e build automaticamente.
+2. **Hospedagem:** Deploy da imagem Docker em serviço de nuvem (AWS/Render).
+3. **Scraping de dados:** Extrair mais informações e checar a integridade da base de dados, buscando atualizações, para sempre ter as informações atualizadas para o cliente.
 
 ---
 
