@@ -8,6 +8,10 @@ services:
       - ./backend/database:/app/schema
       - ./etl/input:/app/input
     command: sh scripts/run_pipeline.sh
+    environment:
+      - DB_PATH=/app/data/database.sqlite
+      - EXCEL_FILE=/app/input/base_2025.xlsx
+      - REPORT_FILE=/app/discrepancy_report.csv
 
   # Serviço 2: API (Node.js)
   # Fica rodando continuamente na porta 3000
