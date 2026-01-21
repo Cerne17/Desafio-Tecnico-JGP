@@ -26,7 +26,11 @@ O projeto foi totalmente containerizado para garantir consistência e facilidade
    ```
 2. Suba o ambiente com um único comando:
     ```bash
+    # MacOS
     docker-compose up --build
+
+    # WSL
+    docker compose up --build
     ```
 3. Acesse a aplicação:
     * **Frontend (Interface):** http://localhost:80
