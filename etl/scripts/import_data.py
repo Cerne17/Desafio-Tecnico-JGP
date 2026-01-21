@@ -38,7 +38,7 @@ def run_etl():
         return
 
     df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce').fillna(0)
-    df['Valor_Centavos'] = (df['Valor'] * 100).astype(int)
+    df['Valor_Centavos'] = (df['Valor'] * 100).round().astype(int)
 
     df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d')
 
