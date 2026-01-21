@@ -9,6 +9,14 @@ EXCEL_FILE = '/app/data/base_2025.xlsx'
 
 EXCEL_FILE_FINAL = '/app/input/base_2025.xlsx'
 
+def clean_data(df):
+    """Limpa e normaliza o DataFrame."""
+    df = df.copy()
+    df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce').fillna(0)
+    df['Valor_Centavos'] = (df['Valor'] * 100).round().astype(int)
+    df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d')
+    return df
+
 def run_etl():
     print("🚀 [ETL] Iniciando processo...")
 
@@ -32,15 +40,11 @@ def run_etl():
 
     print("📖 [ETL] Lendo arquivo Excel...")
     try:
-        df = pd.read_excel(EXCEL_FILE_FINAL)
+        raw_df = pd.read_excel(EXCEL_FILE_FINAL)
+        df = clean_data(raw_df)
     except Exception as e:
-        print(f"❌ [ETL] Erro ao ler Excel: {e}")
+        print(f"❌ [ETL] Erro ao carregar/limpar dados: {e}")
         return
-
-    df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce').fillna(0)
-    df['Valor_Centavos'] = (df['Valor'] * 100).round().astype(int)
-
-    df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d')
 
     print(f"🔄 [ETL] Processando {len(df)} linhas e normalizando dados...")
 
