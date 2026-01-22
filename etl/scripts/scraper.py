@@ -7,7 +7,7 @@ def extract_offer_id(link):
     return match.group(1) if match else None
 
 def fetch_cvm_data(offer_id):
-    Busca dados da oferta da CVM tentando diferentes endpoints em ordem de confiabilidade.
+    """Busca dados da oferta da CVM tentando diferentes endpoints em ordem de confiabilidade."""
     if not offer_id:
         return None
     

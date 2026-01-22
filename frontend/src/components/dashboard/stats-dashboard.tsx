@@ -45,6 +45,9 @@ export function StatsDashboard() {
       maximumFractionDigits: 0
     }).format(val / 100)
 
+  const cleanName = (name: string) =>
+    name.replace(/\s+(S\.?A\.?|S\/A|LTDA\.?|S\.A|HOLDING|SECURITIZADORA).*$/i, "").trim()
+
   if (loading) return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
@@ -103,7 +106,7 @@ export function StatsDashboard() {
             <CardTitle>Top 10 Emissores</CardTitle>
             <CardDescription>Maiores volumes financeiros por emissor</CardDescription>
           </CardHeader>
-          <CardContent className="h-[350px]">
+          <CardContent className="h-[450px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.por_emissor} layout="vertical" margin={{ left: 40, right: 20 }}>
                 <XAxis type="number" hide />
@@ -111,9 +114,13 @@ export function StatsDashboard() {
                   type="category"
                   dataKey="nome"
                   tick={{ fontSize: 11 }}
-                  width={120}
+                  width={180}
                   axisLine={false}
                   tickLine={false}
+                  tickFormatter={(val) => {
+                    const clean = cleanName(val)
+                    return clean.length > 25 ? `${clean.substring(0, 22)}...` : clean
+                  }}
                 />
                 <Tooltip
                   cursor={{ fill: 'transparent', opacity: 0.1 }}
@@ -135,7 +142,7 @@ export function StatsDashboard() {
             <CardTitle>Distribuição por Tipo</CardTitle>
             <CardDescription>Participação de cada ativo no volume total</CardDescription>
           </CardHeader>
-          <CardContent className="h-[350px]">
+          <CardContent className="h-[450px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie

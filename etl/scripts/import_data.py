@@ -16,6 +16,18 @@ if not os.path.exists(DB_PATH) and not os.getenv('DB_PATH'):
 def clean_data(df):
     """Limpa e normaliza o DataFrame."""
     df = df.copy()
+    
+    # Corrige problemas de codificação comuns no Excel/CSV
+    if 'Emissor' in df.columns:
+        df['Emissor'] = df['Emissor'].apply(lambda x: 
+            str(x).replace('A?O', 'ÇÃO') # Caso o Ç também tenha sido perdido
+                 .replace('AÃO', 'ÇÃO')
+                 .replace('A?A', 'ÃA')
+                 .replace('IZAÃO', 'IZAÇÃO') # Específico para Securitização
+                 .strip('.') # Remove pontos extras no fim
+                 if isinstance(x, str) else x
+        )
+
     df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce').fillna(0)
     df['Valor_Centavos'] = (df['Valor'] * 100).round().astype(int)
     df['Data'] = pd.to_datetime(df['Data'], dayfirst=True).dt.strftime('%Y-%m-%d')
