@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react"
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
-import { Loader2, Search } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
 import type { Emissao } from "@/components/emissions/columns"
 import { columns } from "@/components/emissions/columns"
 import { DataTable } from "@/components/emissions/data-table"
 import { EditModal } from "@/components/emissions/edit-modal"
 import { StatsDashboard } from "@/components/dashboard/stats-dashboard"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 import { api } from "@/services/api"
@@ -16,7 +15,6 @@ import { api } from "@/services/api"
 function App() {
   const [data, setData] = useState<Emissao[]>([])
   const [loading, setLoading] = useState(true)
-  const [globalFilter, setGlobalFilter] = useState("")
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedEmissao, setSelectedEmissao] = useState<Emissao | null>(null)
@@ -43,22 +41,17 @@ function App() {
     setIsModalOpen(true)
   }
 
-  const filteredData = data.filter(item => 
-    item.emissor.toLowerCase().includes(globalFilter.toLowerCase()) ||
-    item.id.toString().includes(globalFilter) ||
-    item.tipo.toLowerCase().includes(globalFilter.toLowerCase())
-  )
 
   const columnsWithAction = columns.map(col => {
     if (col.id === "actions") {
       return {
         ...col,
         cell: ({ row }: any) => {
-           return (
-             <Button variant="outline" size="sm" onClick={() => handleEdit(row.original)}>
-                Editar
-             </Button>
-           )
+          return (
+            <Button variant="outline" size="sm" onClick={() => handleEdit(row.original)}>
+              Editar
+            </Button>
+          )
         }
       }
     }
@@ -68,44 +61,34 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <main className="container mx-auto p-4 md:p-8 space-y-8">
-        
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">JGP Crédito</h1>
             <p className="text-slate-500">Gestão de ofertas do mercado primário.</p>
           </div>
           <Button onClick={loadData} variant="outline" disabled={loading}>
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Atualizar Dados
           </Button>
         </div>
 
         <section>
-            <h2 className="text-xl font-semibold mb-4">Visão Geral</h2>
-            <StatsDashboard />
+          <h2 className="text-xl font-semibold mb-4">Visão Geral</h2>
+          <StatsDashboard />
         </section>
 
         <section className="bg-white p-6 rounded-xl border shadow-sm">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <h2 className="text-xl font-semibold">Emissões Recentes</h2>
-            
-            <div className="relative w-full md:w-72">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-                <Input 
-                    placeholder="Buscar por emissor, ID ou tipo..." 
-                    className="pl-8"
-                    value={globalFilter}
-                    onChange={(e) => setGlobalFilter(e.target.value)}
-                />
-            </div>
           </div>
-          
-          <DataTable columns={columnsWithAction} data={filteredData} />
+
+          <DataTable columns={columnsWithAction} data={data} />
         </section>
 
       </main>
 
-      <EditModal 
+      <EditModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         emissao={selectedEmissao}
