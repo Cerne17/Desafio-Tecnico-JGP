@@ -99,7 +99,43 @@ Responsável por sanitizar e estruturar os dados brutos.
 * **TanStack Table:** Gerenciamento avançado de tabelas (ordenação, filtros, paginação).
 * **Recharts:** Biblioteca de gráficos para o dashboard.
 * **Zod & React Hook Form:** Validação robusta de formulários.
+* **Sonner:** Notificações (toasts) elegantes para feedback do usuário.
 * **Docker Multi-stage:** O container final usa Nginx para servir arquivos estáticos, simulando um ambiente de produção real.
+
+## 🔐 Autenticação e Segurança
+
+Para proteger a integridade dos dados financeiros, implementei uma camada de segurança nas operações de escrita:
+
+*   **Tecnologia:** JSON Web Token (JWT).
+*   **Funcionamento:** As rotas de leitura (`GET`) são públicas. Operações de modificação (`PUT`) exigem um token válido no header `Authorization`.
+*   **Persistência:** O token é armazenado de forma segura no `localStorage` do navegador.
+*   **Interface:** Se o usuário tentar editar sem estar autenticado, um modal de login é disparado automaticamente. O sistema também conta com botões explícitos de "Entrar" e "Sair" na barra superior.
+
+> [!IMPORTANT]
+> **Credenciais de Acesso (Modo Admin):**
+> *   **Usuário:** `admin`
+> *   **Senha:** `admin`
+
+## 🚀 API Reference (Endpoints)
+
+A API do backend segue os princípios REST e está documentada abaixo:
+
+### 1. Autenticação
+*   `POST /auth/login`: Autentica o usuário e retorna o token JWT.
+    *   **Body:** `{ "username": "...", "password": "..." }`
+
+### 2. Emissões (Mercado Primário)
+*   `GET /emissoes`: Lista todas as ofertas cadastradas. Suporta filtragem via query params.
+    *   **Query Params:** `emissor` (prefixo do nome).
+*   `GET /emissoes/:id`: Busca detalhes de uma oferta específica.
+*   `PUT /emissoes/:id` [PROTEGIDO]: Atualiza data, valor ou link de uma oferta.
+    *   **Header:** `Authorization: Bearer <token>`
+    *   **Body:** `{ "data": "YYYY-MM-DD", "valor": 1234.56, "link": "..." }`
+
+### 3. Estatísticas e Dashboard
+*   `GET /stats`: Agregados para construção do Dashboard.
+    *   **Retorno:** KPIs gerais, top 10 emissores e distribuição por tipo de ativo.
+*   `GET /stats/emissor/:nome`: Estatísticas detalhadas de um emissor específico.
 
 ## Integridade de Dados e Validação (CVM)
 
@@ -151,8 +187,9 @@ A interface foi projetada para ser intuitiva e simular uma ferramenta real de ge
 * **Dashboard Executivo:** Cards com KPIs (Total, Volume, Ticket Médio) e gráfico de barras dos maiores emissores.
 * **Tabela Interativa:**
     * **Ordenação:** Clique nos cabeçalhos (Data, Valor) para ordenar.
-    * **Busca Global:** Filtre por Nome do Emissor, Tipo ou ID em tempo real.
-    * **Paginação:** Navegação fluida entre registros.
+    * **Busca Multinível:** Filtros dedicados por Nome do Emissor e Tipo de Ativo.
+    * **Paginação Inteligente:** Navegação fluida com indicação de total de páginas.
+    * **Link CVM Direto:** Coluna dedicada para acessar a oferta original na fonte com um clique.
 * **Edição Controlada:**
     * Modal para edição de ofertas.
     * Validação de dados (ex: impede valores negativos ou datas inválidas) usando **Zod**.
@@ -194,10 +231,12 @@ Os testes cobrem:
 * **Limpeza de dados:** Conversão de valores monetários para centavos e formatação de datas.
 
 ## Melhorias Futuras
-1. **CI/CD:** Configurar GitHub Actions para rodar linters e build automaticamente.
-2. **Hospedagem:** Deploy da imagem Docker em serviço de nuvem (AWS/Render).
-3. **Enriquecimento de Dados:** Extrair campos adicionais da CVM (como setor, status e participantes) para análises mais profundas.
+1. **Persistência de Usuários:** Migrar a autenticação mockada para uma tabela de usuários com senhas hasheadas (bcrypt).
+2. **Filtros Combinados via Servidor:** Implementar paginação e filtros diretamente no banco de dados para escalar para milhões de registros.
+3. **Enriquecimento dos dados:** Integrar dados de setores econômicos (CVM) para visualização de exposição setorial no dashboard.
+4. **Exportação de Relatórios:** Botão para download de visões filtradas em PDF ou Excel.
+5. **CI/CD:** Pipeline de deployment automatizado em nuvem (Render/AWS).
 
 ---
 
-*Desenvolvido por Miguel Cerne*
+*Desenvolvido por [Miguel Cerne](https://www.cerne.pro/)*
