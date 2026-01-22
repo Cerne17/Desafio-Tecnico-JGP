@@ -7,15 +7,10 @@ def extract_offer_id(link):
     return match.group(1) if match else None
 
 def fetch_cvm_data(offer_id):
-    """
-    Busca dados da oferta da CVM. 
-    Tenta primeiro o endpoint de 'requerimento' (mais preciso para valores finais)
-    e depois o de 'informacoesGerais'.
-    """
+    Busca dados da oferta da CVM tentando diferentes endpoints em ordem de confiabilidade.
     if not offer_id:
         return None
     
-    # Lista de endpoints para tentar, em ordem de confiabilidade para o Valor Total
     endpoints = [
         f"https://web.cvm.gov.br/sre-publico-cvm/rest/sitePublico/pesquisar/requerimento/{offer_id}",
         f"https://web.cvm.gov.br/sre-publico-cvm/rest/sitePublico/pesquisar/informacoesGerais/{offer_id}"
@@ -31,7 +26,6 @@ def fetch_cvm_data(offer_id):
                 if not data:
                     continue
                 
-                # Se for o endpoint de requerimento, os dados vêm dentro de um objeto
                 if 'requerimento' in url:
                     info = data.get('informacoesGerais', {})
                     val = info.get('valorTotalFinal') or info.get('valorTotal')
@@ -54,7 +48,6 @@ def parse_valor_total(valor_str):
     if not valor_str:
         return 0
     try:
-        # Remove pontos de milhar e substitui vírgula decimal por ponto
         clean_val = str(valor_str).replace('.', '').replace(',', '.')
         return int(round(float(clean_val) * 100))
     except (ValueError, TypeError):

@@ -92,7 +92,7 @@ function App() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         emissao={selectedEmissao}
-        onSuccess={loadData} // Recarrega a tabela ao salvar
+        onSuccess={loadData}
       />
 
       <Toaster />

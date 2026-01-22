@@ -37,7 +37,6 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  // Estados para controle da tabela
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
 
@@ -56,7 +55,6 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  // Extrai tipos únicos para o filtro
   const uniqueTypes = React.useMemo(() => {
     const types = new Set(data.map((item: any) => item.tipo))
     return Array.from(types).filter(Boolean).sort() as string[]
@@ -66,7 +64,6 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      {/* Área de Filtros Avançada */}
       <div className="flex flex-col gap-4 py-4 md:flex-row md:items-center">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -113,7 +110,6 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      {/* A Tabela em si */}
       <div className="rounded-md border bg-white shadow-sm">
         <Table>
           <TableHeader>
@@ -159,7 +155,6 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      {/* Controles de Paginação */}
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"

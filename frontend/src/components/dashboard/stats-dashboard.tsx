@@ -63,7 +63,6 @@ export function StatsDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Cards KPI */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-l-4 border-l-blue-500 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -99,7 +98,6 @@ export function StatsDashboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-7">
-        {/* Gráfico Top Emissores */}
         <Card className="lg:col-span-4 shadow-sm">
           <CardHeader>
             <CardTitle>Top 10 Emissores</CardTitle>
@@ -132,7 +130,6 @@ export function StatsDashboard() {
           </CardContent>
         </Card>
 
-        {/* Gráfico Pizza por Tipo */}
         <Card className="lg:col-span-3 shadow-sm">
           <CardHeader>
             <CardTitle>Distribuição por Tipo</CardTitle>

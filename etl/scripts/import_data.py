@@ -7,7 +7,6 @@ DB_PATH = os.getenv('DB_PATH', '/app/data/database.sqlite')
 SCHEMA_PATH = os.getenv('SCHEMA_PATH', '/app/schema/schema.sql')
 EXCEL_FILE_FINAL = os.getenv('EXCEL_FILE', '/app/input/base_2025.xlsx')
 
-# Se não estiver no Docker, tenta caminhos relativos
 if not os.path.exists(DB_PATH) and not os.getenv('DB_PATH'):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DB_PATH = os.path.join(BASE_DIR, '../data/database.sqlite')
@@ -27,7 +26,6 @@ def run_etl():
 
     if not os.path.exists(EXCEL_FILE_FINAL):
         print(f"❌ [ETL] Erro: Arquivo Excel não encontrado em {EXCEL_FILE_FINAL}")
-        # Em produção, poderíamos levantar uma exceção, mas aqui avisamos para debug
         return
 
     print(f"🔌 [ETL] Conectando ao banco em {DB_PATH}...")
@@ -60,14 +58,12 @@ def run_etl():
         try:
             nome_emissor = str(row['Emissor']).strip()
             
-            # Tenta encontrar o emissor
             cursor.execute("SELECT id FROM Emissor WHERE nome = ?", (nome_emissor,))
             resultado_emissor = cursor.fetchone()
             
             if resultado_emissor:
                 id_emissor = resultado_emissor[0]
             else:
-                # Se não existe, cria
                 cursor.execute("INSERT INTO Emissor (nome) VALUES (?)", (nome_emissor,))
                 id_emissor = cursor.lastrowid
 
