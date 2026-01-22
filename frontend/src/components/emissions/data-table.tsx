@@ -8,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowLeft, ArrowRight } from "lucide-react"
+import { ArrowLeft, ArrowRight, CircleX, Search } from "lucide-react"
 
 import {
   Table,
@@ -20,6 +20,13 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -49,18 +56,61 @@ export function DataTable<TData, TValue>({
     },
   })
 
+  // Extrai tipos únicos para o filtro
+  const uniqueTypes = React.useMemo(() => {
+    const types = new Set(data.map((item: any) => item.tipo))
+    return Array.from(types).filter(Boolean).sort() as string[]
+  }, [data])
+
+  const isFiltered = table.getState().columnFilters.length > 0
+
   return (
     <div className="space-y-4">
-      {/* Área de Filtros */}
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrar por emissor..."
-          value={(table.getColumn("emissor")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("emissor")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      {/* Área de Filtros Avançada */}
+      <div className="flex flex-col gap-4 py-4 md:flex-row md:items-center">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por emissor..."
+            value={(table.getColumn("emissor")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("emissor")?.setFilterValue(event.target.value)
+            }
+            className="pl-9"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Select
+            value={(table.getColumn("tipo")?.getFilterValue() as string) ?? "all"}
+            onValueChange={(value) => {
+              table.getColumn("tipo")?.setFilterValue(value === "all" ? "" : value)
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Todos os tipos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os tipos</SelectItem>
+              {uniqueTypes.map((tipo) => (
+                <SelectItem key={tipo} value={tipo}>
+                  {tipo}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {isFiltered && (
+            <Button
+              variant="ghost"
+              onClick={() => table.resetColumnFilters()}
+              className="h-9 px-2 lg:px-3"
+            >
+              Limpar
+              <CircleX className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* A Tabela em si */}
