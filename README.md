@@ -36,6 +36,9 @@ O projeto foi totalmente containerizado para garantir consistência e facilidade
     * **Frontend (Interface):** http://localhost:80
     * **Backend (API):** http://localhost:3000
 
+> [!NOTE]
+> **Aviso sobre a inicialização:** A execução inicial pode demorar um pouco (geralmente entre 2 e 5 minutos). Isso ocorre porque o projeto adota uma abordagem **stateless**: toda a base de dados é recriada, validada e corrigida via API da CVM a cada vez que o ambiente é iniciado do zero, garantindo que a aplicação sempre funcione conforme o esperado e com dados íntegros.
+
 ## Arquitetura do Projeto
 
 Adotei uma arquitetura orientada a serviços utilizando **Docker Compose** para orquestrar três containers distintos, garantindo separação de responsabilidades:
